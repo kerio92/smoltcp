@@ -18,6 +18,15 @@ const BIOCIMMEDIATE: libc::c_ulong = 0x80044270;
 #[cfg(target_os = "macos")]
 const BPF_HDRLEN: usize = 18;
 
+#[cfg(target_os = "freebsd")]
+const BIOCSETIF: libc::c_ulong = 0x8020426c;
+#[cfg(target_os = "freebsd")]
+const BIOCGBLEN: libc::c_ulong = 0x40044266;
+#[cfg(target_os = "freebsd")]
+const BIOCIMMEDIATE: libc::c_ulong = 0x80044270;
+#[cfg(target_os = "freebsd")]
+const BPF_HDRLEN: usize = 26;
+
 macro_rules! try_ioctl {
     ($fd:expr,$cmd:expr,$req:expr) => {
         unsafe {
@@ -98,6 +107,9 @@ impl BpfDevice {
     }
 
     pub fn recv(&mut self, buffer: &mut [u8]) -> io::Result<usize> {
+        #[cfg(target_os = "freebsd")]
+        todo!("BPF_HDRLEN");
+
         unsafe {
             let len = libc::read(
                 self.fd,
